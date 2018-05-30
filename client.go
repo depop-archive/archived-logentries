@@ -100,5 +100,9 @@ func (r *Request) performrequest(req *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
+	if res.StatusCode == http.StatusBadRequest {
+		return nil, fmt.Errorf("Error with logentries: %s", body)
+	}
+
 	return body, err
 }
