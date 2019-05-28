@@ -13,18 +13,27 @@ type Request struct {
 type LogSetClient struct {
 	Request
 }
+type LogSetsClient struct {
+	Request
+}
 type LogClient struct {
 	Request
 }
 
 type Client struct {
-	Log    *LogClient
-	LogSet *LogSetClient
+	Log     *LogClient
+	LogSet  *LogSetClient
+	LogSets *LogSetsClient
 }
 
 func New(apikey string) *Client {
 	return &Client{
 		LogSet: &LogSetClient{
+			Request{
+				ApiKey: apikey,
+			},
+		},
+		LogSets: &LogSetsClient{
 			Request{
 				ApiKey: apikey,
 			},
