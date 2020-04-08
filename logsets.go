@@ -2,6 +2,7 @@ package logentries
 
 import (
 	"encoding/json"
+	"net/http"
 )
 
 type LogsetsResponse struct {
@@ -17,7 +18,7 @@ type LogSetsReadRequest struct{}
 func (l *LogSetsClient) Read(readRequest *LogSetsReadRequest) (*LogSetsReadResponse, error) {
 	url := "https://rest.logentries.com/management/logsets"
 
-	resp, err := l.getLogentries(url)
+	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type Request struct {
@@ -46,56 +47,48 @@ func New(apikey string) *Client {
 	}
 }
 
-func (r *Request) getLogentries(url string) ([]byte, error) {
+func (r *Request) getLogentries(url string, expected int) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.performrequest(req)
+	return r.performRequest(req, expected)
 }
 
-func (r *Request) postLogentries(url string, payload []byte) ([]byte, error) {
+func (r *Request) postLogentries(url string, payload []byte, expected int) ([]byte, error) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
 
-	return r.performrequest(req)
+	return r.performRequest(req, expected)
 }
 
-func (r *Request) putLogentries(url string, payload []byte) ([]byte, error) {
+func (r *Request) putLogentries(url string, payload []byte, expected int) ([]byte, error) {
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
 
-	return r.performrequest(req)
+	return r.performRequest(req, expected)
 }
-func (r *Request) deleteLogentries(url string) (bool, error) {
+func (r *Request) deleteLogentries(url string, expected int) (bool, error) {
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return false, err
 	}
 
-	client := &http.Client{}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", r.ApiKey)
-
-	res, err := client.Do(req)
+	_, err = r.performRequest(req, expected)
 	if err != nil {
 		return false, err
-	}
-
-	if res.StatusCode != 204 {
-		return false, fmt.Errorf("Logset was not deleted, response was %v", res.StatusCode)
 	}
 
 	return true, nil
 }
 
-func (r *Request) performrequest(req *http.Request) ([]byte, error) {
-	client := &http.Client{}
+func (r *Request) performRequest(req *http.Request, expected int) ([]byte, error) {
+	client := &http.Client{Timeout: time.Duration(5) * time.Second}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-api-key", r.ApiKey)
 
@@ -104,14 +97,21 @@ func (r *Request) performrequest(req *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
+	if res.StatusCode == http.StatusNotFound {
+		return nil, ErrNotFound
 	}
 
-	if res.StatusCode == http.StatusBadRequest {
-		return nil, fmt.Errorf("Error with logentries: %s", body)
+	if res.Body != nil {
+		body, err := ioutil.ReadAll(res.Body)
+		if res.StatusCode != expected {
+			return nil, fmt.Errorf("unexpected logentries response code: %v, payload: %s", res.StatusCode, body)
+		}
+		return body, err
 	}
 
-	return body, err
+	if res.StatusCode != expected {
+		return nil, fmt.Errorf("unexpected logentries response code: %v", res.StatusCode)
+	}
+
+	return nil, nil
 }

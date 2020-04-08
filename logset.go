@@ -2,6 +2,7 @@ package logentries
 
 import (
 	"encoding/json"
+	"net/http"
 )
 
 type LogSetCreateResponse struct {
@@ -77,7 +78,7 @@ func (l *LogSetClient) Create(createRequest *LogSetCreateRequest) (*LogSetCreate
 		return nil, err
 	}
 
-	resp, err := l.postLogentries(url, payload)
+	resp, err := l.postLogentries(url, payload, http.StatusCreated)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (l *LogSetClient) Create(createRequest *LogSetCreateRequest) (*LogSetCreate
 func (l *LogSetClient) Read(readRequest *LogSetReadRequest) (*LogSetReadResponse, error) {
 	url := "https://rest.logentries.com/management/logsets/" + readRequest.ID
 
-	resp, err := l.getLogentries(url)
+	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +119,7 @@ func (l *LogSetClient) Update(updateRequest *LogSetUpdateRequest) (*LogSetUpdate
 		return nil, err
 	}
 
-	resp, err := l.putLogentries(url, payload)
+	resp, err := l.putLogentries(url, payload, http.StatusOK)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +137,7 @@ func (l *LogSetClient) Update(updateRequest *LogSetUpdateRequest) (*LogSetUpdate
 func (l *LogSetClient) Delete(deleteRequest *LogSetDeleteRequest) (bool, error) {
 	url := "https://rest.logentries.com/management/logsets/" + deleteRequest.ID
 
-	success, err := l.deleteLogentries(url)
+	success, err := l.deleteLogentries(url, http.StatusNoContent)
 	if err != nil {
 		return false, err
 	}
