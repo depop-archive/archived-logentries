@@ -77,67 +77,67 @@ type LogUpdateRequestFields struct {
 	Structures  []interface{} `json:"structures"`
 }
 
-func (l *LogClient) Create(createRequest *LogCreateRequest) (*LogCreateResponse, error) {
+func (l *LogClient) Create(createRequest *LogCreateRequest) (LogCreateResponse, error) {
 	url := "https://rest.logentries.com/management/logs/"
 
 	payload, err := json.Marshal(createRequest)
 	if err != nil {
-		return nil, err
+		return LogCreateResponse{}, err
 	}
 
 	resp, err := l.postLogentries(url, payload, http.StatusCreated)
 	if err != nil {
-		return nil, err
+		return LogCreateResponse{}, err
 	}
 
 	var log LogCreateResponse
 
 	err = json.Unmarshal(resp, &log)
 	if err != nil {
-		return nil, err
+		return LogCreateResponse{}, err
 	}
 
-	return &log, nil
+	return log, nil
 }
 
-func (l *LogClient) Read(readRequest *LogReadRequest) (*LogReadResponse, error) {
+func (l *LogClient) Read(readRequest *LogReadRequest) (LogReadResponse, error) {
 	url := "https://rest.logentries.com/management/logs/" + readRequest.ID
 
 	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
-		return nil, err
+		return LogReadResponse{}, err
 	}
 	var log LogReadResponse
 
 	err = json.Unmarshal(resp, &log)
 	if err != nil {
-		return nil, err
+		return LogReadResponse{}, err
 	}
 
-	return &log, nil
+	return log, nil
 }
 
-func (l *LogClient) Update(updateRequest *LogUpdateRequest) (*LogUpdateResponse, error) {
+func (l *LogClient) Update(updateRequest *LogUpdateRequest) (LogUpdateResponse, error) {
 	url := "https://rest.logentries.com/management/logs/" + updateRequest.ID
 
 	payload, err := json.Marshal(&LogUpdateRequestWrapper{Log: updateRequest.Log})
 	if err != nil {
-		return nil, err
+		return LogUpdateResponse{}, err
 	}
 
 	resp, err := l.putLogentries(url, payload, http.StatusOK)
 	if err != nil {
-		return nil, err
+		return LogUpdateResponse{}, err
 	}
 
 	var log LogUpdateResponse
 
 	err = json.Unmarshal(resp, &log)
 	if err != nil {
-		return nil, err
+		return LogUpdateResponse{}, err
 	}
 
-	return &log, nil
+	return log, nil
 
 }
 func (l *LogClient) Delete(deleteRequest *LogDeleteRequest) (bool, error) {

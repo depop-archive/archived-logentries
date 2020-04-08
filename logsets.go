@@ -15,20 +15,19 @@ type LogSetsReadResponse struct {
 
 type LogSetsReadRequest struct{}
 
-func (l *LogSetsClient) Read(readRequest *LogSetsReadRequest) (*LogSetsReadResponse, error) {
+func (l *LogSetsClient) Read(readRequest *LogSetsReadRequest) (LogSetsReadResponse, error) {
 	url := "https://rest.logentries.com/management/logsets"
 
 	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
-		return nil, err
+		return LogSetsReadResponse{}, err
 	}
 
 	var logsets LogSetsReadResponse
-
 	err = json.Unmarshal(resp, &logsets)
 	if err != nil {
-		return nil, err
+		return LogSetsReadResponse{}, err
 	}
 
-	return &logsets, nil
+	return logsets, nil
 }

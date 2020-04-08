@@ -70,68 +70,67 @@ type UserData struct {
 	LeNameintr string `json:"le_nameintr"`
 }
 
-func (l *LogSetClient) Create(createRequest *LogSetCreateRequest) (*LogSetCreateResponse, error) {
+func (l *LogSetClient) Create(createRequest *LogSetCreateRequest) (LogSetCreateResponse, error) {
 	url := "https://rest.logentries.com/management/logsets/"
 
 	payload, err := json.Marshal(createRequest)
 	if err != nil {
-		return nil, err
+		return LogSetCreateResponse{}, err
 	}
 
 	resp, err := l.postLogentries(url, payload, http.StatusCreated)
 	if err != nil {
-		return nil, err
+		return LogSetCreateResponse{}, err
 	}
 
 	var logset LogSetCreateResponse
 
 	err = json.Unmarshal(resp, &logset)
 	if err != nil {
-		return nil, err
+		return LogSetCreateResponse{}, err
 	}
 
-	return &logset, nil
+	return logset, nil
 }
 
-func (l *LogSetClient) Read(readRequest *LogSetReadRequest) (*LogSetReadResponse, error) {
+func (l *LogSetClient) Read(readRequest *LogSetReadRequest) (LogSetReadResponse, error) {
 	url := "https://rest.logentries.com/management/logsets/" + readRequest.ID
 
 	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
-		return nil, err
+		return LogSetReadResponse{}, err
 	}
 
 	var logset LogSetReadResponse
-
 	err = json.Unmarshal(resp, &logset)
 	if err != nil {
-		return nil, err
+		return LogSetReadResponse{}, err
 	}
 
-	return &logset, nil
+	return logset, nil
 }
 
-func (l *LogSetClient) Update(updateRequest *LogSetUpdateRequest) (*LogSetUpdateResponse, error) {
+func (l *LogSetClient) Update(updateRequest *LogSetUpdateRequest) (LogSetUpdateResponse, error) {
 	url := "https://rest.logentries.com/management/logsets/" + updateRequest.ID
 
 	payload, err := json.Marshal(&LogSetUpdateRequestWrapper{LogSet: updateRequest.LogSet})
 	if err != nil {
-		return nil, err
+		return LogSetUpdateResponse{}, err
 	}
 
 	resp, err := l.putLogentries(url, payload, http.StatusOK)
 	if err != nil {
-		return nil, err
+		return LogSetUpdateResponse{}, err
 	}
 
 	var logset LogSetUpdateResponse
 
 	err = json.Unmarshal(resp, &logset)
 	if err != nil {
-		return nil, err
+		return LogSetUpdateResponse{}, err
 	}
 
-	return &logset, nil
+	return logset, nil
 
 }
 func (l *LogSetClient) Delete(deleteRequest *LogSetDeleteRequest) (bool, error) {
