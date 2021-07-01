@@ -71,7 +71,7 @@ type UserData struct {
 }
 
 func (l *LogSetClient) Create(createRequest *LogSetCreateRequest) (LogSetCreateResponse, error) {
-	url := "https://rest.logentries.com/management/logsets/"
+	url := l.getUrl(logentriesLogsetsResource)
 
 	payload, err := json.Marshal(createRequest)
 	if err != nil {
@@ -94,7 +94,7 @@ func (l *LogSetClient) Create(createRequest *LogSetCreateRequest) (LogSetCreateR
 }
 
 func (l *LogSetClient) Read(readRequest *LogSetReadRequest) (LogSetReadResponse, error) {
-	url := "https://rest.logentries.com/management/logsets/" + readRequest.ID
+	url := l.getUrl(logentriesLogsetsResource + readRequest.ID)
 
 	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
@@ -111,7 +111,7 @@ func (l *LogSetClient) Read(readRequest *LogSetReadRequest) (LogSetReadResponse,
 }
 
 func (l *LogSetClient) Update(updateRequest *LogSetUpdateRequest) (LogSetUpdateResponse, error) {
-	url := "https://rest.logentries.com/management/logsets/" + updateRequest.ID
+	url := l.getUrl(logentriesLogsetsResource + updateRequest.ID)
 
 	payload, err := json.Marshal(&LogSetUpdateRequestWrapper{LogSet: updateRequest.LogSet})
 	if err != nil {
@@ -134,7 +134,7 @@ func (l *LogSetClient) Update(updateRequest *LogSetUpdateRequest) (LogSetUpdateR
 
 }
 func (l *LogSetClient) Delete(deleteRequest *LogSetDeleteRequest) (bool, error) {
-	url := "https://rest.logentries.com/management/logsets/" + deleteRequest.ID
+	url := l.getUrl(logentriesLogsetsResource + deleteRequest.ID)
 
 	success, err := l.deleteLogentries(url, http.StatusNoContent)
 	if err != nil {

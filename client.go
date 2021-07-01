@@ -9,7 +9,8 @@ import (
 )
 
 type Request struct {
-	ApiKey string
+	ApiKey   string
+	ProxyUrl string
 }
 type LogSetClient struct {
 	Request
@@ -27,24 +28,42 @@ type Client struct {
 	LogSets *LogSetsClient
 }
 
-func New(apikey string) *Client {
+const logentriesApi = "https://rest.logentries.com/"
+const logentriesLogsResource = "management/logs/"
+const logentriesLogsetsResource = "management/logsets/"
+
+func New(apikey string, proxyurlOpt ...string) *Client {
+	proxyUrl := ""
+	if len(proxyurlOpt) > 0 {
+		proxyUrl = proxyurlOpt[0]
+	}
 	return &Client{
 		LogSet: &LogSetClient{
 			Request{
-				ApiKey: apikey,
+				ApiKey:   apikey,
+				ProxyUrl: proxyUrl,
 			},
 		},
 		LogSets: &LogSetsClient{
 			Request{
-				ApiKey: apikey,
+				ApiKey:   apikey,
+				ProxyUrl: proxyUrl,
 			},
 		},
 		Log: &LogClient{
 			Request{
-				ApiKey: apikey,
+				ApiKey:   apikey,
+				ProxyUrl: proxyUrl,
 			},
 		},
 	}
+}
+
+func (r *Request) getUrl(resource string) string {
+	if r.ProxyUrl != "" {
+		return r.ProxyUrl + resource
+	}
+	return logentriesApi + resource
 }
 
 func (r *Request) getLogentries(url string, expected int) ([]byte, error) {

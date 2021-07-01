@@ -78,7 +78,7 @@ type LogUpdateRequestFields struct {
 }
 
 func (l *LogClient) Create(createRequest *LogCreateRequest) (LogCreateResponse, error) {
-	url := "https://rest.logentries.com/management/logs/"
+	url := l.getUrl(logentriesLogsResource)
 
 	payload, err := json.Marshal(createRequest)
 	if err != nil {
@@ -101,7 +101,7 @@ func (l *LogClient) Create(createRequest *LogCreateRequest) (LogCreateResponse, 
 }
 
 func (l *LogClient) Read(readRequest *LogReadRequest) (LogReadResponse, error) {
-	url := "https://rest.logentries.com/management/logs/" + readRequest.ID
+	url := l.getUrl(logentriesLogsResource + readRequest.ID)
 
 	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
@@ -118,7 +118,7 @@ func (l *LogClient) Read(readRequest *LogReadRequest) (LogReadResponse, error) {
 }
 
 func (l *LogClient) Update(updateRequest *LogUpdateRequest) (LogUpdateResponse, error) {
-	url := "https://rest.logentries.com/management/logs/" + updateRequest.ID
+	url := l.getUrl(logentriesLogsResource + updateRequest.ID)
 
 	payload, err := json.Marshal(&LogUpdateRequestWrapper{Log: updateRequest.Log})
 	if err != nil {
@@ -141,7 +141,7 @@ func (l *LogClient) Update(updateRequest *LogUpdateRequest) (LogUpdateResponse, 
 
 }
 func (l *LogClient) Delete(deleteRequest *LogDeleteRequest) (bool, error) {
-	url := "https://rest.logentries.com/management/logs/" + deleteRequest.ID
+	url := l.getUrl(logentriesLogsResource + deleteRequest.ID)
 
 	success, err := l.deleteLogentries(url, http.StatusNoContent)
 	if err != nil {
