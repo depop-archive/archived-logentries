@@ -16,7 +16,7 @@ type LogSetsReadResponse struct {
 type LogSetsReadRequest struct{}
 
 func (l *LogSetsClient) Read(readRequest *LogSetsReadRequest) (LogSetsReadResponse, error) {
-	url := "https://rest.logentries.com/management/logsets"
+	url := l.getUrl(logentriesLogsetsResource)
 
 	resp, err := l.getLogentries(url, http.StatusOK)
 	if err != nil {
