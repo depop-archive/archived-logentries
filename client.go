@@ -107,7 +107,7 @@ func (r *Request) deleteLogentries(url string, expected int) (bool, error) {
 }
 
 func (r *Request) performRequest(req *http.Request, expected int) ([]byte, error) {
-	client := &http.Client{Timeout: time.Duration(5) * time.Second}
+	client := &http.Client{Timeout: time.Duration(10) * time.Second}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-api-key", r.ApiKey)
 
